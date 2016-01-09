@@ -1,0 +1,24 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="com.jalenmassey.keep.NotesActivity">
+
+    <item
+        android:id="@+id/search_button"
+        android:orderInCategory="1"
+        app:showAsAction="always"
+        android:title="Search"
+        android:icon="@drawable/ic_search_white_24dp"
+        />
+    <item
+        android:id="@+id/multiselect_button"
+        android:orderInCategory="2"
+        app:showAsAction="ifRoom"
+        android:title="Multi-Select"
+        android:icon="@drawable/ic_select_all_white_24dp"/>
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never"/>
+</menu>

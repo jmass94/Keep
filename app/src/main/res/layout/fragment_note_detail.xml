@@ -1,0 +1,54 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                tools:context="com.jalenmassey.keep.NoteDetailFragment"
+                tools:showIn="@layout/activity_note_detail"
+                android:background="#d7d7d7">
+
+        <LinearLayout
+            android:id="@+id/detail_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            >
+
+            <EditText
+                android:capitalize="sentences"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="70dp"
+                android:id="@+id/detail_title"
+                android:hint="@string/note_title"
+                android:inputType="textCapSentences|text"
+                android:textStyle="bold"
+                android:background="@android:color/transparent"/>
+
+            <ScrollView
+                android:id="@+id/detail_scroll_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <EditText
+                    android:capitalize="sentences"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="200dp"
+                    android:gravity="top"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:ems="10"
+                    android:id="@+id/detail_note"
+                    android:hint="@string/note"
+                    android:focusable="true"
+                    android:background="@android:color/transparent"/>
+
+            </ScrollView>
+
+        </LinearLayout>
+</RelativeLayout>
