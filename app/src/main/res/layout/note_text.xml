@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     android:id="@+id/note_name"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -10,7 +10,15 @@
     android:background="@drawable/rect"
     android:elevation="4dp"
     android:minHeight="100dp"
-    android:maxHeight="100dp">
+    android:maxHeight="100dp"
+    android:orientation="vertical">
+
+    <CheckBox
+        android:id="@+id/check_note"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:buttonTint="@color/colorPrimary"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/title_text"
@@ -26,7 +34,9 @@
         android:paddingTop="@dimen/card_spacing"
         android:text="@string/app_name"
         android:textSize="17sp"
-        android:textStyle="bold">
+        android:textStyle="bold"
+        android:focusable="false"
+        android:focusableInTouchMode="false">
     </TextView>
 
     <TextView
@@ -42,7 +52,9 @@
         android:paddingLeft="@dimen/card_spacing"
         android:paddingRight="@dimen/card_spacing"
         android:text="@string/app_name"
-        android:textSize="14sp">
+        android:textSize="14sp"
+        android:focusableInTouchMode="false"
+        android:focusable="false">
     </TextView>
 
-</RelativeLayout>
+</LinearLayout>

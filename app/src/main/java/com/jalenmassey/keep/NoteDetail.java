@@ -2,22 +2,20 @@ package com.jalenmassey.keep;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
+import android.widget.SearchView;
 
 public class NoteDetail extends AppCompatActivity {
 
@@ -31,7 +29,12 @@ public class NoteDetail extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        try {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        catch (NullPointerException e) {
+            Log.e("DisplayHomeAsUp", e.getMessage());
+        }
 
         activity = this;
     }
@@ -80,7 +83,12 @@ public class NoteDetail extends AppCompatActivity {
     private void verifyDelete() {
         InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         View view = activity.getCurrentFocus();
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        try {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+        catch (NullPointerException e) {
+            Log.e("GetWindowToken", e.getMessage());
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setMessage(R.string.close_note)
                 .setNegativeButton(R.string.confirm_delete, new DialogInterface.OnClickListener() {

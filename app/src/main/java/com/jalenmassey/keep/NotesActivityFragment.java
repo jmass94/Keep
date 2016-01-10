@@ -1,16 +1,31 @@
 package com.jalenmassey.keep;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.NavUtils;
+import android.support.v7.view.menu.ActionMenuItemView;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.GridView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +35,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.zip.CheckedInputStream;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -32,8 +48,23 @@ public class NotesActivityFragment extends Fragment implements Serializable {
     private final String FILE_NAMET = "priv_serial_notesT";
     private final String FILE_NAMEI = "priv_serial_notesI";
     private static FragmentActivity context;
+    private static GridView allNotes;
+    private View rootView;
+
+    private static ActionMode mActionMode;
+    private ActionMode mode;
 
     public NotesActivityFragment() {
+    }
+
+    public void selectAll() {
+        for(int i = allNotes.getChildCount()-1; i >= 0; i--) {
+            View v = allNotes.getChildAt(i);
+            CheckBox cb = (CheckBox)v.findViewById(R.id.check_note);
+            cb.setChecked(true);
+            cb.setVisibility(View.VISIBLE);
+        }
+        mActionMode = context.startActionMode(mActionModeCallback);
     }
 
     public void addNote(String[] note, int pos) {
@@ -49,8 +80,10 @@ public class NotesActivityFragment extends Fragment implements Serializable {
     }
 
     public void deleteNote(int pos) {
-        noteTitles.remove(pos);
-        noteTexts.remove(pos);
+        if(pos >= 0) {
+            noteTitles.remove(pos);
+            noteTexts.remove(pos);
+        }
         Toast t = Toast.makeText(context, R.string.success_delete, Toast.LENGTH_LONG);
         t.show();
         save();
@@ -108,7 +141,7 @@ public class NotesActivityFragment extends Fragment implements Serializable {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_notes, container, false);
+        rootView = inflater.inflate(R.layout.fragment_notes, container, false);
 
         context = getActivity();
 
@@ -123,11 +156,94 @@ public class NotesActivityFragment extends Fragment implements Serializable {
 
         adapter = new NoteAdapter();
 
-        GridView allNotes = (GridView)rootView.findViewById(R.id.notesLV);
+        allNotes = (GridView)rootView.findViewById(R.id.notesLV);
         allNotes.setAdapter(adapter);
 
         return rootView;
     }
+
+    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+
+        @Override
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            Window window = context.getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(context.getResources().getColor(R.color.colorAccentDark));
+            MenuInflater inflater = actionMode.getMenuInflater();
+            inflater.inflate(R.menu.menu_notes_selecting, menu);
+            mode = actionMode;
+            mode.setTitle("Selection Mode");
+            FloatingActionButton fab = (FloatingActionButton)context.findViewById(R.id.fab);
+            fab.setVisibility(View.GONE);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+            Log.v("CAB", "Prep CAB");
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode actionMode) {
+            Log.v("CAB", String.valueOf(allNotes.getChildCount()));
+            uncheck();
+            mActionMode = null;
+            Window window = context.getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(context.getResources().getColor(R.color.colorPrimaryDark));
+            FloatingActionButton fab = (FloatingActionButton)context.findViewById(R.id.fab);
+            fab.setVisibility(View.VISIBLE);
+        }
+
+        private void uncheck() {
+            for(int i = allNotes.getChildCount()-1; i >= 0; i--) {
+                View v = allNotes.getChildAt(i);
+                CheckBox cb = (CheckBox)v.findViewById(R.id.check_note);
+                cb.setChecked(false);
+                cb.setVisibility(View.GONE);
+            }
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+            Log.v("CAB", "Clicked CAB");
+            switch(menuItem.getItemId()) {
+                case R.id.delete_notes_selected: {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setMessage(R.string.confirm_delete_selected)
+                            .setNegativeButton(R.string.confirm_delete, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    for(int y = allNotes.getChildCount()-1; y >= 0; y--) {
+                                        View v = allNotes.getChildAt(y);
+                                        CheckBox cb = (CheckBox)v.findViewById(R.id.check_note);
+                                        if(cb.isChecked()) {
+                                            noteTitles.remove(y);
+                                            noteTexts.remove(y);
+                                            save();
+                                        }
+                                        cb.setChecked(false);
+                                    }
+                                    //uncheck();
+                                }
+                            })
+                            .setNeutralButton(R.string.cancel_close, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                }
+                            });
+
+                    builder.create().show();
+                }
+            }
+            return true;
+
+
+        }
+    };
 
     /**
      * Custom adapter for GridView.
@@ -137,7 +253,7 @@ public class NotesActivityFragment extends Fragment implements Serializable {
         LayoutInflater inflater;
 
         public NoteAdapter() {
-            inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
         @Override
@@ -158,6 +274,7 @@ public class NotesActivityFragment extends Fragment implements Serializable {
         }
 
         public class Hold {
+            CheckBox checkBox;
             TextView title;
             TextView sub;
         }
@@ -171,7 +288,10 @@ public class NotesActivityFragment extends Fragment implements Serializable {
             View v = view;
             hold.title = (TextView)v.findViewById(R.id.title_text);
             hold.sub = (TextView)v.findViewById(R.id.info_text);
-
+            hold.checkBox = (CheckBox)v.findViewById(R.id.check_note);
+            final CheckBox cB = hold.checkBox;
+            if(mActionMode == null)
+                cB.setVisibility(View.GONE);
             try {
                 hold.title.setText(noteTitles.get(i));
                 hold.sub.setText(noteTexts.get(i));
@@ -193,19 +313,28 @@ public class NotesActivityFragment extends Fragment implements Serializable {
                 }
             });
 
-            /**
-             * TODO
-             * On long click, user should be able to batch select notes for archiving
-             */
             v.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-
-                    return false;
+                    if(mActionMode == null) {
+                        mActionMode = context.startActionMode(mActionModeCallback);
+                        showChecks();
+                    }
+                    cB.setChecked(true);
+                    return true;
                 }
             });
 
             return v;
+        }
+
+        private void showChecks() {
+            View v;
+            for(int i = 0; i < allNotes.getChildCount(); i++) {
+                v = allNotes.getChildAt(i);
+                CheckBox cB = (CheckBox)v.findViewById(R.id.check_note);
+                cB.setVisibility(View.VISIBLE);
+            }
         }
     }
 }

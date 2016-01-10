@@ -6,15 +6,16 @@
     <item
         android:id="@+id/search_button"
         android:orderInCategory="1"
-        app:showAsAction="always"
-        android:title="Search"
+        app:showAsAction="collapseActionView|ifRoom"
+        android:title="@string/search"
         android:icon="@drawable/ic_search_white_24dp"
+        app:actionViewClass="android.widget.SearchView"
         />
     <item
         android:id="@+id/multiselect_button"
         android:orderInCategory="2"
         app:showAsAction="ifRoom"
-        android:title="Multi-Select"
+        android:title="@string/batch"
         android:icon="@drawable/ic_select_all_white_24dp"/>
     <item
         android:id="@+id/action_settings"

@@ -17,5 +17,6 @@
         android:numColumns="2"
         android:verticalSpacing="20dp"
         android:clipToPadding="false"
+        android:choiceMode="multipleChoiceModal"
         />
 </RelativeLayout>

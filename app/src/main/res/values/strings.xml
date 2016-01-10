@@ -7,9 +7,13 @@
 
     <!-- Main Activity -->
     <string name="success_delete">Note successfully deleted</string>
+    <string name="search">Search</string>
+    <string name="batch">Select All</string>
+    <string name="confirm_delete_selected">Delete selected items? Operation cannot be undone.</string>
 
     <!-- Detail Menu -->
     <string name="delete">Delete</string>
+    <string name="search_hint">search</string>
 
     <!-- Detail Activity -->
     <string name="confirm_delete">Yes</string>
